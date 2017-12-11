@@ -24,8 +24,6 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseUser;
@@ -44,7 +42,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      * Id to identity READ_CONTACTS permission request.
      */
     private static final int REQUEST_READ_CONTACTS = 0;
-    private static final String USER = "user";
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
@@ -161,28 +158,38 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            Task<AuthResult> resultTask = mAuth.createUserWithEmailAndPassword(email, password)
-                    .addOnCompleteListener(LoginActivity.this, this::onComplete);
-            if (resultTask.getException() instanceof FirebaseAuthUserCollisionException) {
-                mAuth.signInWithEmailAndPassword(email, password)
-                        .addOnCompleteListener(LoginActivity.this, this::onComplete);
-            }
-
+            mAuth.createUserWithEmailAndPassword(email, password)
+                    .addOnCompleteListener(LoginActivity.this, task -> {
+                        if (task.isSuccessful()) {
+                            startMainActivity();
+                        } else {
+                            if (task.getException() instanceof FirebaseAuthUserCollisionException) {
+                                mAuth.signInWithEmailAndPassword(email, password)
+                                        .addOnCompleteListener(LoginActivity.this, secTask -> {
+                                            if (secTask.isSuccessful()) {
+                                                startMainActivity();
+                                            } else {
+                                                showProgress(false);
+                                                mPasswordView.setError(getString(R.string.error_incorrect_password));
+                                                mPasswordView.requestFocus();
+                                            }
+                                        });
+                            } else {
+                                showProgress(false);
+                                mPasswordView.setError(getString(R.string.error_incorrect_password));
+                                mPasswordView.requestFocus();
+                            }
+                        }
+                    });
         }
     }
 
-    private void onComplete(Task<AuthResult> task) {
-        if (task.isSuccessful()) {
-            showProgress(false);
-            FirebaseUser user = mAuth.getCurrentUser();
-            ((App) getApplication()).setUser(user);
-            Intent intent = new Intent(this, MainActivity.class);
-            startActivity(intent);
-        } else {
-            showProgress(false);
-            mPasswordView.setError(getString(R.string.error_incorrect_password));
-            mPasswordView.requestFocus();
-        }
+    private void startMainActivity() {
+        showProgress(false);
+        FirebaseUser user = mAuth.getCurrentUser();
+        ((App) getApplication()).setUser(user);
+        Intent intent = new Intent(this, QuizPagerActivity.class);
+        startActivity(intent);
     }
 
     private boolean isEmailValid(String email) {
