@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "1044616036038",
+    "firebase_url": "https://autism-quiz.firebaseio.com",
+    "project_id": "autism-quiz",
+    "storage_bucket": "autism-quiz.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1044616036038:android:0c84ed9c418fc2d0",
+        "android_client_info": {
+          "package_name": "com.qwerfghi.autismquiz"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1044616036038-b99kc8eahvfl5pr2ee18g32vu3nsp9kd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.qwerfghi.autismquiz",
+            "certificate_hash": "6fee3618fdfe3954b31e9ba24367deac38f058a3"
+          }
+        },
+        {
+          "client_id": "1044616036038-lke4mptv6a4cntqcve10vd68joqrkjth.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDSWdRs7rX9xS_In7Z6LYw_Tdbe1A9Kn38"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1044616036038-lke4mptv6a4cntqcve10vd68joqrkjth.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
