@@ -11,6 +11,7 @@ import com.google.firebase.auth.FirebaseUser;
 public class App extends Application {
 
     private FirebaseUser user;
+    private boolean[] answers = new boolean[10];
 
     public FirebaseUser getUser() {
         return user;
@@ -18,5 +19,9 @@ public class App extends Application {
 
     public void setUser(FirebaseUser user) {
         this.user = user;
+    }
+
+    public boolean[] getAnswers() {
+        return answers;
     }
 }
