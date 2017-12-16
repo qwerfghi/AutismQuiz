@@ -1,8 +1,11 @@
 package com.qwerfghi.autismquiz;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +23,8 @@ public class QuestionFragment extends Fragment {
     private static final String QUESTION_ID = "question_id";
 
     private Question mQuestion;
+    private boolean[] mAnswers;
+    private boolean[] mCheckedAnswers;
 
     private Button mFirstAnswerButton;
     private Button mSecondAnswerButton;
@@ -38,6 +43,13 @@ public class QuestionFragment extends Fragment {
         args.putInt(QUESTION_ID, id);
         fragment.setArguments(args);
         return fragment;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mAnswers = ((App) getActivity().getApplication()).getAnswers();
+        mCheckedAnswers = ((App) getActivity().getApplication()).getCheckedAnswers();
     }
 
     @Override
@@ -76,6 +88,7 @@ public class QuestionFragment extends Fragment {
                 mFourthAnswerButton.setText(mQuestion.getFourthAnswer());
 
                 mQuestionText.setText(mQuestion.getQuestion());
+                if (mCheckedAnswers[mQuestion.getId()]) setButtonsUnclickable();
             }
 
             @Override
@@ -87,28 +100,43 @@ public class QuestionFragment extends Fragment {
 
     public void onClick(View view) {
         int answer = mQuestion.getNumOfRightAnswer();
+        Button button = (Button) view;
+        Log.d("asd", "click");
         if (answer == getButtonNum(view)) {
-            view.setBackgroundColor(getResources().getColor(R.color.green));
+            button.setBackgroundColor(getResources().getColor(R.color.green));
+            mAnswers[mQuestion.getId()] = true;
         } else {
-            view.setBackgroundColor(getResources().getColor(R.color.red));
-            view.findViewById(getButtonId(answer))
-                    .setBackgroundColor(getResources().getColor(R.color.green));
+            button.setBackgroundColor(getResources().getColor(R.color.red));
+            mAnswers[mQuestion.getId()] = false;
         }
+        mCheckedAnswers[mQuestion.getId()] = true;
+        int count = 0;
+        for (boolean checkedAnswer : mCheckedAnswers) {
+            if (checkedAnswer) count++;
+        }
+        if (count == mAnswers.length) {
+            FirebaseDatabase database = FirebaseDatabase.getInstance();
+            DatabaseReference myRef = database.getReference("results");
+            Result result = new Result();
+            result.setId(myRef.push().getKey());
+            result.setEmail(((App) getActivity().getApplication()).getUser().getEmail());
+            int score = 0;
+            for (boolean rightAnswer : mAnswers) {
+                if (rightAnswer) score++;
+            }
+            result.setScore(score);
+            myRef.child(result.getId()).setValue(result);
+            Intent intent = new Intent(getActivity(), ResultActivity.class);
+            startActivity(intent);
+        }
+        setButtonsUnclickable();
     }
 
-    private int getButtonId(int num) {
-        switch (num) {
-            case 1:
-                return R.id.first_answer;
-            case 2:
-                return R.id.second_answer;
-            case 3:
-                return R.id.third_answer;
-            case 4:
-                return R.id.fourth_answer;
-            default:
-                return 0;
-        }
+    private void setButtonsUnclickable() {
+        mFirstAnswerButton.setClickable(false);
+        mSecondAnswerButton.setClickable(false);
+        mThirdAnswerButton.setClickable(false);
+        mFourthAnswerButton.setClickable(false);
     }
 
     private int getButtonNum(View view) {

@@ -32,6 +32,7 @@ public class QuizPagerActivity extends AppCompatActivity {
         int count = getIntent().getIntExtra(QUESTION_COUNT, 0);
 
         mViewPager = findViewById(R.id.question_view_pager);
+        mViewPager.setOffscreenPageLimit(2);
         FragmentManager fragmentManager = getSupportFragmentManager();
         mViewPager.setAdapter(new FragmentStatePagerAdapter(fragmentManager) {
             @Override
